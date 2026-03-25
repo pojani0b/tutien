@@ -37,7 +37,7 @@ async function logAdminAction(
 
 // ---- SEARCH PLAYERS ----
 router.get('/players', async (req: AuthRequest, res: Response) => {
-  const { q, server_id } = req.query;
+  const q = req.query.q as string; const server_id = req.query.server_id as string;
   let query = supabase.from('characters').select('character_id, name, username, server_id, realm, is_dead, cultivation');
   if (q) query = query.ilike('name', `%${q}%`);
   if (server_id) query = query.eq('server_id', server_id as string);
@@ -57,7 +57,7 @@ router.get('/player/:characterId', async (req: AuthRequest, res: Response) => {
 // ---- EDIT CHARACTER STATS ----
 router.patch('/player/:characterId', async (req: AuthRequest, res: Response) => {
   const admin = req.user!.username;
-  const { characterId } = req.params;
+  const characterId = req.params.characterId as string;
   const updates = req.body as Partial<Character>;
 
   // Whitelist editable fields
@@ -80,7 +80,7 @@ router.patch('/player/:characterId', async (req: AuthRequest, res: Response) => 
 // ---- REVIVE CHARACTER ----
 router.post('/player/:characterId/revive', async (req: AuthRequest, res: Response) => {
   const admin = req.user!.username;
-  const { characterId } = req.params;
+  const characterId = req.params.characterId as string;
   const { hp = 100, server_id } = req.body as { hp: number; server_id: string };
 
   const { error } = await supabase.from('characters')
@@ -96,7 +96,7 @@ router.post('/player/:characterId/revive', async (req: AuthRequest, res: Respons
 // ---- PERMADEATH (permanent kill) ----
 router.post('/player/:characterId/permadeath', async (req: AuthRequest, res: Response) => {
   const admin = req.user!.username;
-  const { characterId } = req.params;
+  const characterId = req.params.characterId as string;
   const { reason = 'Admin permadeath', server_id, world_time = 0 } = req.body as {
     reason: string; server_id: string; world_time: number;
   };
@@ -124,7 +124,7 @@ router.post('/player/:characterId/permadeath', async (req: AuthRequest, res: Res
 router.post('/user/:username/ban', async (req: AuthRequest, res: Response) => {
   const admin = req.user!.username;
   const { reason = 'Bị quản trị viên khóa tài khoản' } = req.body as { reason: string };
-  const { username } = req.params;
+  const username = req.params.username as string;
 
   const { error } = await supabase.from('users').update({ ban: reason }).eq('username', username);
   if (error) { res.status(500).json({ error: error.message }); return; }
@@ -136,7 +136,7 @@ router.post('/user/:username/ban', async (req: AuthRequest, res: Response) => {
 // ---- UNBAN USER ----
 router.post('/user/:username/unban', async (req: AuthRequest, res: Response) => {
   const admin = req.user!.username;
-  const { username } = req.params;
+  const username = req.params.username as string;
   const { error } = await supabase.from('users').update({ ban: null }).eq('username', username);
   if (error) { res.status(500).json({ error: error.message }); return; }
   await logAdminAction(admin, 'unban', 'user', username, {});
@@ -146,7 +146,7 @@ router.post('/user/:username/unban', async (req: AuthRequest, res: Response) => 
 // ---- GOD MODE ----
 router.post('/player/:characterId/godmode', async (req: AuthRequest, res: Response) => {
   const admin = req.user!.username;
-  const { characterId } = req.params;
+  const characterId = req.params.characterId as string;
   const { enabled } = req.body as { enabled: boolean };
 
   const { data: char } = await supabase.from('characters').select('stats').eq('character_id', characterId).single();
@@ -161,7 +161,7 @@ router.post('/player/:characterId/godmode', async (req: AuthRequest, res: Respon
 // ---- GIFT (single player) ----
 router.post('/gift/:characterId', async (req: AuthRequest, res: Response) => {
   const admin = req.user!.username;
-  const { characterId } = req.params;
+  const characterId = req.params.characterId as string;
   const { type, value } = req.body as { type: 'cultivation' | 'luck' | 'item'; value: unknown };
 
   const { data: char } = await supabase.from('characters').select('*').eq('character_id', characterId).single();
@@ -183,7 +183,7 @@ router.post('/gift/:characterId', async (req: AuthRequest, res: Response) => {
 // ---- GIFT ALL PLAYERS IN SERVER ----
 router.post('/gift-all/:serverId', async (req: AuthRequest, res: Response) => {
   const admin = req.user!.username;
-  const { serverId } = req.params;
+  const serverId = req.params.serverId as string;
   const { type, value } = req.body as { type: string; value: unknown };
 
   const { data: chars } = await supabase
@@ -212,7 +212,7 @@ router.post('/gift-all/:serverId', async (req: AuthRequest, res: Response) => {
 // ---- TELEPORT ----
 router.post('/player/:characterId/teleport', async (req: AuthRequest, res: Response) => {
   const admin = req.user!.username;
-  const { characterId } = req.params;
+  const characterId = req.params.characterId as string;
   const { location } = req.body as { location: string };
 
   const { data: char } = await supabase.from('characters').select('stats').eq('character_id', characterId).single();
@@ -242,7 +242,7 @@ router.post('/entity/spawn', async (req: AuthRequest, res: Response) => {
 // ---- REMOVE WORLD ENTITY ----
 router.delete('/entity/:entityId', async (req: AuthRequest, res: Response) => {
   const admin = req.user!.username;
-  const { entityId } = req.params;
+  const entityId = req.params.entityId as string;
   await supabase.from('world_entities').update({ is_destroyed: true }).eq('entity_id', entityId);
   await logAdminAction(admin, 'remove_entity', 'world_entity', entityId, {});
   res.json({ success: true });
@@ -251,7 +251,7 @@ router.delete('/entity/:entityId', async (req: AuthRequest, res: Response) => {
 // ---- ROLLBACK EVENT ----
 router.post('/event/:eventId/rollback', async (req: AuthRequest, res: Response) => {
   const admin = req.user!.username;
-  const { eventId } = req.params;
+  const eventId = req.params.eventId as string;
   const success = await rollbackEvent(eventId, admin);
   await logAdminAction(admin, 'rollback_event', 'world_event', eventId, {});
   res.json({ success });
@@ -260,7 +260,7 @@ router.post('/event/:eventId/rollback', async (req: AuthRequest, res: Response) 
 // ---- BROADCAST TO SERVER ----
 router.post('/broadcast/:serverId', async (req: AuthRequest, res: Response) => {
   const admin = req.user!.username;
-  const { serverId } = req.params;
+  const serverId = req.params.serverId as string;
   const { message, world_time = 0 } = req.body as { message: string; world_time: number };
 
   const event = await broadcastAdminMessage(serverId, admin, message, world_time);
@@ -271,7 +271,7 @@ router.post('/broadcast/:serverId', async (req: AuthRequest, res: Response) => {
 // ---- SET RESPAWN ----
 router.patch('/entity/:entityId/respawn', async (req: AuthRequest, res: Response) => {
   const admin = req.user!.username;
-  const { entityId } = req.params;
+  const entityId = req.params.entityId as string;
   const { respawn_at } = req.body as { respawn_at: string };
   await supabase.from('world_entities').update({ respawn_at, is_destroyed: false }).eq('entity_id', entityId);
   await logAdminAction(admin, 'set_respawn', 'world_entity', entityId, { respawn_at });

@@ -33,7 +33,7 @@ router.get('/servers', async (_req: AuthRequest, res: Response) => {
 
 // ---- GET SAVE SLOTS ----
 router.get('/slots/:serverId', async (req: AuthRequest, res: Response) => {
-  const { serverId } = req.params;
+  const serverId = req.params.serverId as string;
   const username = req.user!.username;
 
   const { data, error } = await supabase
@@ -50,7 +50,8 @@ router.get('/slots/:serverId', async (req: AuthRequest, res: Response) => {
 
 // ---- DELETE SLOT ----
 router.delete('/slot/:serverId/:slotIndex', async (req: AuthRequest, res: Response) => {
-  const { serverId, slotIndex } = req.params;
+  const serverId = req.params.serverId as string;
+  const slotIndex = req.params.slotIndex as string;
   const username = req.user!.username;
 
   const { error } = await supabase
@@ -145,7 +146,7 @@ router.post('/create-character', async (req: AuthRequest, res: Response) => {
 
 // ---- GET GAME STATE ----
 router.get('/state/:characterId', async (req: AuthRequest, res: Response) => {
-  const { characterId } = req.params;
+  const characterId = req.params.characterId as string;
   const username = req.user!.username;
 
   const { data: char, error } = await supabase
@@ -363,7 +364,7 @@ router.post('/action', async (req: AuthRequest, res: Response) => {
 
 // ---- GET RANKINGS ----
 router.get('/rankings/:serverId', async (req: AuthRequest, res: Response) => {
-  const { serverId } = req.params;
+  const serverId = req.params.serverId as string;
 
   // Tu vi ranking (cultivation)
   const { data: cultivationRank } = await supabase

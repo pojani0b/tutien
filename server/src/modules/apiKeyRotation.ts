@@ -160,7 +160,7 @@ export async function withKeyRotation<T>(
   let failedId: number | null = null;
 
   for (let attempt = 0; attempt < maxRetries; attempt++) {
-    const keyEntry = failedId
+    const keyEntry: ApiKeyServer | null = failedId
       ? await getNextApiKeyAfter(failedId)
       : await getNextApiKey();
 
