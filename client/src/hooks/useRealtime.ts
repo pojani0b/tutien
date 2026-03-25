@@ -8,8 +8,8 @@ import { useEffect, useRef } from 'react';
 import { createClient } from '@supabase/supabase-js';
 import { useGameStore } from '../store/useGameStore';
 
-const supabaseUrl = import.meta.env.VITE_SUPABASE_URL ?? '';
-const supabaseAnonKey = import.meta.env.VITE_SUPABASE_ANON_KEY ?? '';
+const supabaseUrl = import.meta.env.VITE_SUPABASE_URL || 'https://txaveuqmckywokvtzvay.supabase.co';
+const supabaseAnonKey = import.meta.env.VITE_SUPABASE_ANON_KEY || 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InR4YXZldXFtY2t5d29rdnR6dmF5Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzQzNTk0MjksImV4cCI6MjA4OTkzNTQyOX0.U8WUXSAp3t-61e66lahVV37QTKx0o49TjGBAsBK0Qwk';
 
 // Create a separate anon client for Realtime (read-only, public anon key)
 const supabaseClient = supabaseUrl && supabaseAnonKey

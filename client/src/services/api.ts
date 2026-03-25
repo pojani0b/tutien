@@ -3,7 +3,9 @@
 // All calls go to the backend (never to Supabase directly)
 // ============================================================
 
-const BASE_URL = import.meta.env.VITE_API_BASE_URL ?? '/api';
+const BASE_URL = import.meta.env.DEV
+  ? (import.meta.env.VITE_API_BASE_URL || 'http://localhost:3001/api')
+  : 'https://tutien.onrender.com/api';
 
 function getToken(): string {
   try {
