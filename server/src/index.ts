@@ -21,7 +21,7 @@ const PORT = parseInt(process.env.PORT ?? '3001', 10);
 
 // ---- MIDDLEWARE ----
 app.use(cors({
-  origin: process.env.CLIENT_ORIGIN ?? 'http://localhost:5173',
+  origin: true,
   credentials: true,
 }));
 app.use(express.json({ limit: '2mb' }));
