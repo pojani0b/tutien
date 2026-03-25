@@ -1,0 +1,19 @@
+{
+  "name": "hong-hoang-rpg",
+  "version": "1.0.0",
+  "private": true,
+  "description": "Hồng Hoang Text RPG — Multiplayer Authoritative Server Game",
+  "workspaces": [
+    "client",
+    "server"
+  ],
+  "scripts": {
+    "dev": "concurrently \"npm run dev --workspace=server\" \"npm run dev --workspace=client\"",
+    "install:all": "npm install && npm install --workspace=client && npm install --workspace=server",
+    "migrate": "node server/scripts/migrate.mjs",
+    "seed": "node server/scripts/seed.mjs"
+  },
+  "devDependencies": {
+    "concurrently": "^8.2.2"
+  }
+}
